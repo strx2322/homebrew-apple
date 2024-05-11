@@ -88226,7 +88226,7 @@ diff --git a/dlls/mfreadwrite/reader.c b/dlls/mfreadwrite/reader.c
 index e7b7b55..ea0058b 100644
 --- wine/dlls/mfreadwrite/reader.c
 +++ wine/dlls/mfreadwrite/reader.c
-@@ -2472,6 +2472,92 @@ failed:
+@@ -2472,6 +2472,93 @@ failed:
      return hr;
  }
  
@@ -88280,7 +88280,8 @@ index e7b7b55..ea0058b 100644
 +
 +    if (FAILED(hr = IMFByteStream_GetCurrentPosition(stream, &position)))
 +        return hr;
-+
++        
++    ULONG length = 0;
 +    hr = IMFByteStream_Read(stream, buffer, sizeof(buffer), &length);
 +    IMFByteStream_SetCurrentPosition(stream, position);
 +    if (FAILED(hr))
@@ -88319,7 +88320,7 @@ index e7b7b55..ea0058b 100644
  static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttributes *attributes,
          REFIID riid, void **out)
  {
-@@ -2479,8 +2565,13 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
+@@ -2479,8 +2566,13 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
      IMFSourceResolver *resolver;
      MF_OBJECT_TYPE obj_type;
      IMFMediaSource *source;
@@ -88333,7 +88334,7 @@ index e7b7b55..ea0058b 100644
      if (FAILED(hr = MFCreateSourceResolver(&resolver)))
          return hr;
  
-@@ -2488,7 +2579,7 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
+@@ -2488,7 +2580,7 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
          IMFAttributes_GetUnknown(attributes, &MF_SOURCE_READER_MEDIASOURCE_CONFIG, &IID_IPropertyStore,
                  (void **)&props);
  
