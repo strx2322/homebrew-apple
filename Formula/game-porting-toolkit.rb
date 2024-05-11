@@ -89623,3 +89623,67 @@ index 9cd9317dd..045a3c2ef 100644
 +    context->Rsp = context->R14;; /* WOW64_TLS_WINEHYBRID_RESERVED_R14 */
      return STATUS_SUCCESS;
  }    
+ diff --git a/wine/dlls/atiadlxx/atiadlxx_main.c b/wine/dlls/atiadlxx/atiadlxx_main.c
+ index 9e67c74..b74570b 100644
+ --- wine/dlls/atiadlxx/atiadlxx_main.c
+ +++ wine/dlls/atiadlxx/atiadlxx_main.c
+ @@ -378,6 +378,8 @@ static int convert_vendor_id(int id)
+  
+  int WINAPI ADL_Adapter_AdapterInfo_Get(ADLAdapterInfo *adapters, int input_size);
+  
+ +int WINAPI ADL_Adapter_AdapterInfoX2_Get(ADLAdapterInfoX2 *adapters, int input_size);
+ +
+  int WINAPI ADL2_Display_EdidData_Get(int adapter_index, int display_index, void* edid_data)
+  {
+      FIXME("adapter_index %d, display_index %p, edid_data %p\n", 
+ @@ -406,7 +408,7 @@ int WINAPI ADL2_Adapter_AdapterInfoX4_Get(ADL_CONTEXT_HANDLE handle, int adapter
+      }
+      *info = (ADLAdapterInfoX2*)adl_malloc(sizeof(ADLAdapterInfoX2) * 1);
+      memset(*info, 0, sizeof(ADLAdapterInfoX2));
+ -    status = ADL_Adapter_AdapterInfo_Get(*info, sizeof(ADLAdapterInfo));
+ +    status = ADL_Adapter_AdapterInfoX2_Get(*info, sizeof(ADLAdapterInfo));
+      if (status == ADL_OK)
+      {
+          info[0]->iInfoMask = 1; 
+ @@ -464,6 +466,41 @@ int WINAPI ADL_Adapter_AdapterInfo_Get(ADLAdapterInfo *adapters, int input_size)
+      return ADL_OK;
+  }
+  
+ +int WINAPI ADL_Adapter_AdapterInfoX2_Get(ADLAdapterInfoX2 *adapters, int input_size)
+ +{
+ +    int count, i, j;
+ +    DXGI_ADAPTER_DESC adapter_desc;
+ +
+ +    FIXME("adapters %p, input_size %d, stub!\n", adapters, input_size);
+ +
+ +    ADL_Adapter_NumberOfAdapters_Get(&count);
+ +
+ +    if (!adapters) return ADL_ERR_INVALID_PARAM;
+ +    if (input_size != count * sizeof(ADLAdapterInfo)) return ADL_ERR_INVALID_PARAM;
+ +
+ +    memset(adapters, 0, input_size);
+ +
+ +    for (i = 0; i < count; i++)
+ +    {
+ +        adapters[i].iSize = sizeof(ADLAdapterInfo);
+ +        adapters[i].iAdapterIndex = i;
+ +
+ +        if (get_adapter_desc(i, &adapter_desc) != ADL_OK)
+ +            return ADL_ERR;
+ +
+ +        adapters[i].iVendorID = convert_vendor_id(adapter_desc.VendorId);
+ +
+ +        for (j = 0; j < 128; ++j)
+ +        {
+ +            adapters[i].strAdapterName[j] = (char)adapter_desc.Description[j];
+ +            if (adapters[i].strAdapterName[j] == 0)
+ +               break;
+ +        }
+ +    }
+ +
+ +    return ADL_OK;
+ +}
+ +
+  int WINAPI ADL_Display_DisplayInfo_Get(int adapter_index, int *num_displays, ADLDisplayInfo **info, int force_detect)
+  {
+      IDXGIAdapter *adapter;
