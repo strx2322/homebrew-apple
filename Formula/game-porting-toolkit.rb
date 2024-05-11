@@ -89611,3 +89611,15 @@ index 9f88738..9e67c74 100644
  int WINAPI ADL2_Adapter_Graphic_Core_Info_Get(ADL_CONTEXT_HANDLE *ptr, int iAdapterIndex, LPADLGraphicInfoCore pGraphicsInfo)
  {
      FIXME("ptr %p, iAdapterIndex %u, pGraphicsInfo %p\n", ptr, iAdapterIndex, pGraphicsInfo);
+diff --git a/sources/wine/dlls/wow64cpu/cpu.c b/sources/wine/dlls/wow64cpu/cpu.c
+index 9cd9317dd..045a3c2ef 100644
+--- a/sources/wine/dlls/wow64cpu/cpu.c
++++ b/sources/wine/dlls/wow64cpu/cpu.c
+@@ -353,7 +353,7 @@ NTSTATUS WINAPI BTCpuResetToConsistentState( EXCEPTION_POINTERS *ptrs )
+     /* fixup context to pretend that we jumped to 64-bit mode */
+     context->Rip = (ULONG64)syscall_32to64;
+     context->SegCs = cs64_sel;
+-    context->Rsp = NtCurrentTeb()->TlsSlots[2]; /* WOW64_TLS_WINEHYBRID_RESERVED_R14 */
++    context->Rsp = context->R14;; /* WOW64_TLS_WINEHYBRID_RESERVED_R14 */
+     return STATUS_SUCCESS;
+     }
