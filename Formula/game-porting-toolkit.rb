@@ -89622,4 +89622,4 @@ index 9cd9317dd..045a3c2ef 100644
 -    context->Rsp = NtCurrentTeb()->TlsSlots[2]; /* WOW64_TLS_WINEHYBRID_RESERVED_R14 */
 +    context->Rsp = context->R14;; /* WOW64_TLS_WINEHYBRID_RESERVED_R14 */
      return STATUS_SUCCESS;
-     }
+ }    
