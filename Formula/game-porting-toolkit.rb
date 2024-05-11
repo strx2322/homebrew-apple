@@ -89613,8 +89613,8 @@ index 9f88738..9e67c74 100644
      FIXME("ptr %p, iAdapterIndex %u, pGraphicsInfo %p\n", ptr, iAdapterIndex, pGraphicsInfo);
 diff --git a/wine/dlls/wow64cpu/cpu.c b/wine/dlls/wow64cpu/cpu.c
 index 9cd9317dd..045a3c2ef 100644
---- a/wine/dlls/wow64cpu/cpu.c
-+++ b/wine/dlls/wow64cpu/cpu.c
+--- wine/dlls/wow64cpu/cpu.c
++++ wine/dlls/wow64cpu/cpu.c
 @@ -353,7 +353,7 @@ NTSTATUS WINAPI BTCpuResetToConsistentState( EXCEPTION_POINTERS *ptrs )
      /* fixup context to pretend that we jumped to 64-bit mode */
      context->Rip = (ULONG64)syscall_32to64;
