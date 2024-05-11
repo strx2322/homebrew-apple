@@ -88280,14 +88280,14 @@ index e7b7b55..ea0058b 100644
 +
 +    if (FAILED(hr = IMFByteStream_GetCurrentPosition(stream, &position)))
 +        return hr;
-+        
-+    ULONG length = 0;
-+    hr = IMFByteStream_Read(stream, buffer, sizeof(buffer), &length);
++
++    ULONG ulength = 0;
++    hr = IMFByteStream_Read(stream, buffer, sizeof(buffer), &ulength);
 +    IMFByteStream_SetCurrentPosition(stream, position);
 +    if (FAILED(hr))
 +        return hr;
 +
-+    if (length < sizeof(buffer))
++    if (ulength < sizeof(buffer))
 +        return S_OK;
 +
 +    for (i = 0; i < ARRAY_SIZE(url_hints); ++i)
@@ -88317,30 +88317,30 @@ index e7b7b55..ea0058b 100644
 +    return S_OK;
 +}
 +
- static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttributes *attributes,
-         REFIID riid, void **out)
- {
+static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttributes *attributes,
+     REFIID riid, void **out)
+{
 @@ -2479,8 +2566,13 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
      IMFSourceResolver *resolver;
      MF_OBJECT_TYPE obj_type;
      IMFMediaSource *source;
 +    const WCHAR *url;
      HRESULT hr;
- 
+
 +    /* If stream does not have content type set, try to guess from starting byte sequence. */
 +    if (FAILED(hr = bytestream_get_url_hint(stream, &url)))
 +        return hr;
 +
      if (FAILED(hr = MFCreateSourceResolver(&resolver)))
-         return hr;
- 
+     return hr;
+
 @@ -2488,7 +2580,7 @@ static HRESULT create_source_reader_from_stream(IMFByteStream *stream, IMFAttrib
-         IMFAttributes_GetUnknown(attributes, &MF_SOURCE_READER_MEDIASOURCE_CONFIG, &IID_IPropertyStore,
-                 (void **)&props);
- 
+     IMFAttributes_GetUnknown(attributes, &MF_SOURCE_READER_MEDIASOURCE_CONFIG, &IID_IPropertyStore,
+               (void **)&props);
+
 -    hr = IMFSourceResolver_CreateObjectFromByteStream(resolver, stream, NULL, MF_RESOLUTION_MEDIASOURCE
 +    hr = IMFSourceResolver_CreateObjectFromByteStream(resolver, stream, url, MF_RESOLUTION_MEDIASOURCE
-             | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE, props, &obj_type, (IUnknown **)&source);
+          | MF_RESOLUTION_CONTENT_DOES_NOT_HAVE_TO_MATCH_EXTENSION_OR_MIME_TYPE, props, &obj_type, (IUnknown **)&source);
      IMFSourceResolver_Release(resolver);
      if (props)
 diff --git a/include/wine/strmbase.h b/include/wine/strmbase.h
